@@ -1,5 +1,3 @@
-// Flora_Pac by @leaskh
-// www.leaskh.com, i@leaskh.com
 
 function FindProxyForURL(url, host) {
 
@@ -2153,7 +2151,7 @@ function FindProxyForURL(url, host) {
                      ((bytes[2] & 0xff) <<  8) |
                       (bytes[3] & 0xff);
         return result;
-    }
+    };
 
     function match(ip, list) {
         var left = 0, right = list.length;
@@ -2169,28 +2167,30 @@ function FindProxyForURL(url, host) {
                 right = mid;
             }
         } while (left + 1 <= right)
+
         return false;
-    }
+    };
 
     if (isPlainHostName(host)
      || (host === '127.0.0.1')
      || (host === 'localhost')
+     || (shExpMatch(host, "*.cn"))
      || (/\b([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\b/.test(host))) { // @todo @removing
         return 'DIRECT';
-    }
+    };
 
     var strDomain = '.' + host;
     for (var i in safeDomains) {
         if (strDomain.indexOf('.' + safeDomains[i]) !== -1) {
             return 'DIRECT';
         }
-    }
+    };
 
     for (i in dangerDomains) {
         if (strDomain.indexOf('.' + dangerDomains[i]) !== -1) {
             return 'PROXY 10.0.1.5:8103';
         }
-    }
+    };
 
     var intPort = parseInt(host.split(':')[1]);
     if (intPort) {
@@ -2199,18 +2199,16 @@ function FindProxyForURL(url, host) {
                 return 'DIRECT';
             }
         }
-    }
+    };
 
     var strIp = dnsResolve(host);
     if (!strIp) {
         return 'DIRECT';
-    }
+    };
 
     var intIp = convertAddress(strIp);
     if (match(intIp, list)) {
         return 'DIRECT';
-    }
-
+    };
     return 'PROXY 10.0.1.5:8103';
-
-}
+};

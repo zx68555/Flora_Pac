@@ -9,6 +9,7 @@ import argparse
 import math
 import socket
 import struct
+from jsmin import jsmin
 
 
 def ip2long(ip):
@@ -19,7 +20,9 @@ def ip2long(ip):
 def generate_pac(proxy):
     results  = fetch_ip_data()
     pacfile  = 'flora_pac.pac'
+    pacfile_min  = 'flora_pac_min.pac'
     rfile    = open(pacfile, 'w')
+    rmfile    = open(pacfile_min, 'w')
     results.insert(0, (ip2long('127.0.0.1'),   ip2long('255.0.0.0'),   0))
     results.insert(1, (ip2long('10.0.0.0'),    ip2long('255.0.0.0'),   0))
     results.insert(2, (ip2long('172.16.0.0'),  ip2long('255.240.0.0'), 0))
@@ -30,9 +33,7 @@ def generate_pac(proxy):
 
     results = sorted(results, key = ip)
 
-    strLines = """// Flora_Pac by @leaskh
-// www.leaskh.com, i@leaskh.com
-
+    strLines = """
 function FindProxyForURL(url, host) {
 
     var list = ["""
@@ -392,6 +393,7 @@ function FindProxyForURL(url, host) {
         'zhihu.com',
         'zhimg.com',
         'zhubajie.com',
+        'v2ex.com',
         'zongheng.com'
     ];
 
@@ -447,7 +449,7 @@ function FindProxyForURL(url, host) {
                      ((bytes[2] & 0xff) <<  8) |
                       (bytes[3] & 0xff);
         return result;
-    }
+    };
 
     function match(ip, list) {
         var left = 0, right = list.length;
@@ -463,28 +465,30 @@ function FindProxyForURL(url, host) {
                 right = mid;
             }
         } while (left + 1 <= right)
+
         return false;
-    }
+    };
 
     if (isPlainHostName(host)
      || (host === '127.0.0.1')
      || (host === 'localhost')
+     || (shExpMatch(host, "*.cn"))
      || (/\\b([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\\b/.test(host))) { // @todo @removing
         return 'DIRECT';
-    }
+    };
 
     var strDomain = '.' + host;
     for (var i in safeDomains) {
         if (strDomain.indexOf('.' + safeDomains[i]) !== -1) {
             return 'DIRECT';
         }
-    }
+    };
 
     for (i in dangerDomains) {
         if (strDomain.indexOf('.' + dangerDomains[i]) !== -1) {
             return '%s';
         }
-    }
+    };
 
     var intPort = parseInt(host.split(':')[1]);
     if (intPort) {
@@ -493,24 +497,27 @@ function FindProxyForURL(url, host) {
                 return 'DIRECT';
             }
         }
-    }
+    };
 
     var strIp = dnsResolve(host);
     if (!strIp) {
         return 'DIRECT';
-    }
+    };
 
     var intIp = convertAddress(strIp);
     if (match(intIp, list)) {
         return 'DIRECT';
-    }
-
+    };
     return '%s';
-
-}
+};
 """%(proxy, proxy)
     rfile.write(strLines)
     rfile.close()
+    with open(pacfile) as js_file:
+        pac_min = jsmin(js_file.read())
+        rmfile.write(pac_min)
+        rmfile.close()
+
     print ("Rules: %d items.\n"
            "Usage: Use the newly created %s as your web browser's automatic "
            "PAC(Proxy auto-config) file."%(intLines, pacfile))
