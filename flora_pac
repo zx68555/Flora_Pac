@@ -393,6 +393,7 @@ function FindProxyForURL(url, host) {
         'zhimg.com',
         'zhubajie.com',
         'v2ex.com',
+        'cocimg.com',
         'zongheng.com'
     ];
 
