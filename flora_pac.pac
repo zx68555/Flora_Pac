@@ -2107,7 +2107,8 @@ function FindProxyForURL(url, host) {
         'twitter.com',
         'facebook.com',
         'tw.yahoo.com',
-        'youtube.com'
+        'youtube.com',
+        'zaobao.com.sg'
     ];
 
     var fakeIps = [
