@@ -395,7 +395,6 @@ function FindProxyForURL(url, host) {
         'v2ex.com',
         'cocimg.com',
         'zongheng.com',
-        'yinxiang.com',
         'evernote.com',
         'feng.com'
     ];
@@ -503,11 +502,11 @@ function FindProxyForURL(url, host) {
         var left = 0, right = list.length;
         do {
             var mid = Math.floor((left + right) / 2),
-                ip  = (ip & list[mid][1]) >>> 0,
+                ip_f  = (ip & list[mid][1]) >>> 0,
                 m   = (list[mid][0] & list[mid][1]) >>> 0;
-            if (ip == m) {
+            if (ip_f == m) {
                 return true;
-            } else if (ip > m) {
+            } else if (ip_f > m) {
                 left  = mid + 1;
             } else {
                 right = mid;

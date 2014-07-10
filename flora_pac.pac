@@ -406,6 +406,7 @@ function FindProxyForURL(url, host) {
         [1743323136, 4294901760],
         [1743388672, 4294901760],
         [1743454208, 4294901760],
+        [1743585280, 4294901760],
         [1743781888, 4294901760],
         [1743847424, 4294901760],
         [1743912960, 4294901760],
@@ -2106,9 +2107,7 @@ function FindProxyForURL(url, host) {
         'v2ex.com',
         'cocimg.com',
         'zongheng.com',
-        'yinxiang.com',
         'evernote.com',
-        'feng.com'
     ];
 
     var dangerDomains = [
@@ -2214,11 +2213,11 @@ function FindProxyForURL(url, host) {
         var left = 0, right = list.length;
         do {
             var mid = Math.floor((left + right) / 2),
-                ip  = (ip & list[mid][1]) >>> 0,
+                ip_f  = (ip & list[mid][1]) >>> 0,
                 m   = (list[mid][0] & list[mid][1]) >>> 0;
-            if (ip == m) {
+            if (ip_f == m) {
                 return true;
-            } else if (ip > m) {
+            } else if (ip_f > m) {
                 left  = mid + 1;
             } else {
                 right = mid;
