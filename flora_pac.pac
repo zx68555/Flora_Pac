@@ -211,7 +211,8 @@ function FindProxyForURL(url, host) {
         [994836480, 4294901760],
         [994902016, 4294901760],
         [994967552, 4294836224],
-        [995098624, 4294705152],
+        [995098624, 4294836224],
+        [995229696, 4294836224],
         [996868096, 4294901760],
         [996933632, 4294836224],
         [997064704, 4294836224],
@@ -404,6 +405,7 @@ function FindProxyForURL(url, host) {
         [1743257600, 4294901760],
         [1743323136, 4294901760],
         [1743388672, 4294901760],
+        [1743454208, 4294901760],
         [1743781888, 4294901760],
         [1743847424, 4294901760],
         [1743912960, 4294901760],
@@ -432,7 +434,8 @@ function FindProxyForURL(url, host) {
         [1781661696, 4294901760],
         [1781792768, 4294705152],
         [1782054912, 4294443008],
-        [1783234560, 4294836224],
+        [1783234560, 4294901760],
+        [1783300096, 4294901760],
         [1783627776, 4293918720],
         [1785462784, 4294705152],
         [1785724928, 4294443008],
@@ -798,7 +801,9 @@ function FindProxyForURL(url, host) {
         [2015887360, 4294705152],
         [2016149504, 4294705152],
         [2016411648, 4294836224],
-        [2016673792, 4294705152],
+        [2016673792, 4294901760],
+        [2016739328, 4294901760],
+        [2016804864, 4294836224],
         [2017460224, 4294705152],
         [2017722368, 4294705152],
         [2017984512, 4294901760],
@@ -1084,6 +1089,7 @@ function FindProxyForURL(url, host) {
         [2525036544, 4294901760],
         [2525626368, 4294836224],
         [2531196928, 4294901760],
+        [2532442112, 4294901760],
         [2533294080, 4294901760],
         [2566914048, 4294901760],
         [2567110656, 4294901760],
@@ -1104,6 +1110,7 @@ function FindProxyForURL(url, host) {
         [2724790272, 4294901760],
         [2734686208, 4294901760],
         [2737766400, 4294901760],
+        [2738159616, 4294901760],
         [2742878208, 4294901760],
         [2743992320, 4294901760],
         [2746286080, 4294901760],
@@ -1805,7 +1812,6 @@ function FindProxyForURL(url, host) {
         'aliyuncs.com',
         'anzhi.com',
         'appinn.com',
-        'apple.com',
         'appsina.com',
         'archlinuxcn.org',
         'atpanel.com',
@@ -2098,7 +2104,11 @@ function FindProxyForURL(url, host) {
         'zhimg.com',
         'zhubajie.com',
         'v2ex.com',
-        'zongheng.com'
+        'cocimg.com',
+        'zongheng.com',
+        'yinxiang.com',
+        'evernote.com',
+        'feng.com'
     ];
 
     var dangerDomains = [
@@ -2235,7 +2245,7 @@ function FindProxyForURL(url, host) {
 
     for (i in dangerDomains) {
         if (strDomain.indexOf('.' + dangerDomains[i]) !== -1) {
-            return 'PROXY 10.0.1.5:8103';
+            return 'PROXY 127.0.0.1:8103; SOCKS5 127.0.0.1:8104; SOCKS 127.0.0.1:8104; DIRECT';
         }
     };
 
@@ -2250,23 +2260,18 @@ function FindProxyForURL(url, host) {
 
     var strIp = dnsResolve(host);
     if (!strIp) {
-<<<<<<< HEAD
-        return 'DIRECT';
-    };
-=======
-        return 'SOCKS5 127.0.0.1:8964; SOCKS 127.0.0.1:8964; DIRECT';
+        return 'PROXY 127.0.0.1:8103; SOCKS5 127.0.0.1:8104; SOCKS 127.0.0.1:8104; DIRECT';
     }
 
     for (i in fakeIps) {
         if (fakeIps[i] === strIp) {
-            return 'SOCKS5 127.0.0.1:8964; SOCKS 127.0.0.1:8964; DIRECT';
+            return 'PROXY 127.0.0.1:8103; SOCKS5 127.0.0.1:8104; SOCKS 127.0.0.1:8104; DIRECT';
         }
     }
->>>>>>> upstream/master
 
     var intIp = convertAddress(strIp);
     if (match(intIp, list)) {
         return 'DIRECT';
     };
-    return 'PROXY 10.0.1.5:8103';
-};
+    return 'PROXY 127.0.0.1:8103; SOCKS5 127.0.0.1:8104; SOCKS 127.0.0.1:8104; DIRECT';
+}

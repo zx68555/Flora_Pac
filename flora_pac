@@ -395,6 +395,8 @@ function FindProxyForURL(url, host) {
         'v2ex.com',
         'cocimg.com',
         'zongheng.com',
+        'yinxiang.com',
+        'evernote.com',
         'feng.com'
     ];
 
