@@ -627,8 +627,8 @@ def fetch_ip_data():
         mask2=32-int(math.log(num_ip,2))
 
         ip=starting_ip.split('.')
-        ip[2] = '0'
-        ip[3] = '0'
+        #ip[2] = '0'
+        #ip[3] = '0'
         starting_ip = '.'.join(ip)
         #if starting_ip != prev_net:
         results.append((ip2long(starting_ip), ip2long(mask), mask2))
