@@ -2108,6 +2108,7 @@ function FindProxyForURL(url, host) {
         'cocimg.com',
         'zongheng.com',
         'evernote.com',
+        'feng.com'
     ];
 
     var dangerDomains = [
