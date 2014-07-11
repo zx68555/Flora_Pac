@@ -61,7 +61,6 @@ function FindProxyForURL(url, host) {
         [29360128, 4294443008],
         [30015488, 4294836224],
         [30146560, 4294705152],
-        [167772160, 4278190080],
         [234881024, 4294965248],
         [234884096, 4294966272],
         [234946560, 4294966272],
@@ -1766,7 +1765,6 @@ function FindProxyForURL(url, host) {
         [2111700992, 4294836224],
         [2113830912, 4294950912],
         [2113847296, 4294950912],
-        [2130706433, 4278190080],
         [2260992000, 4294901760],
         [2332622848, 4294901760],
         [2340487168, 4294901760],
@@ -1915,7 +1913,6 @@ function FindProxyForURL(url, host) {
         [2876506112, 4294705152],
         [2876768256, 4294443008],
         [2882535424, 4293918720],
-        [2886729728, 4293918720],
         [2936012800, 4293918720],
         [2937061376, 4294443008],
         [2937585664, 4294705152],
@@ -2019,7 +2016,6 @@ function FindProxyForURL(url, host) {
         [3082289152, 4294443008],
         [3082813440, 4290772992],
         [3229391360, 4294967040],
-        [3232235520, 4294901760],
         [3233589760, 4294967040],
         [3389023232, 4294966784],
         [3389028864, 4294966784],
@@ -4431,26 +4427,21 @@ function FindProxyForURL(url, host) {
         return false;
     };
 
+
     if (isPlainHostName(host)
      || (host === '127.0.0.1')
      || (host === 'localhost')
-     || (shExpMatch(host, "*.cn"))
      || (/\b([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\b/.test(host))) { // @todo @removing
         return 'DIRECT';
     };
 
-    var strDomain = '.' + host;
-    for (var i in safeDomains) {
-        if (strDomain.indexOf('.' + safeDomains[i]) !== -1) {
+    var strIp = dnsResolve(host);
+ 
+    if (isInNet(strIp, "10.0.0.0", "255.0.0.0") ||
+        isInNet(strIp, "172.16.0.0",  "255.240.0.0") ||
+        isInNet(strIp, "192.168.0.0", "255.255.0.0") ||
+        isInNet(strIp, "127.0.0.0", "255.255.255.0"))
             return 'DIRECT';
-        }
-    };
-
-    for (i in dangerDomains) {
-        if (strDomain.indexOf('.' + dangerDomains[i]) !== -1) {
-            return 'PROXY 127.0.0.1:8103; SOCKS5 127.0.0.1:8104; SOCKS 127.0.0.1:8104; DIRECT';
-        }
-    };
 
     var intPort = parseInt(host.split(':')[1]);
     if (intPort) {
@@ -4461,20 +4452,37 @@ function FindProxyForURL(url, host) {
         }
     };
 
-    var strIp = dnsResolve(host);
+    if (shExpMatch(host, "*.cn"))
+        return 'PROXY proxy-shz.intel.com:912';
+
+    var strDomain = '.' + host;
+    for (var i in safeDomains) {
+        if (strDomain.indexOf('.' + safeDomains[i]) !== -1) {
+            return 'PROXY proxy-shz.intel.com:912';
+        }
+    };
+
+    for (i in dangerDomains) {
+        if (strDomain.indexOf('.' + dangerDomains[i]) !== -1) {
+            return 'SOCKS5 proxy.jf.intel.com:1080';
+        }
+    };
+
+    
     if (!strIp) {
-        return 'PROXY 127.0.0.1:8103; SOCKS5 127.0.0.1:8104; SOCKS 127.0.0.1:8104; DIRECT';
+        return 'SOCKS5 proxy.jf.intel.com:1080';
     }
 
     for (i in fakeIps) {
         if (fakeIps[i] === strIp) {
-            return 'PROXY 127.0.0.1:8103; SOCKS5 127.0.0.1:8104; SOCKS 127.0.0.1:8104; DIRECT';
+            return 'SOCKS5 proxy.jf.intel.com:1080';
         }
     }
 
     var intIp = convertAddress(strIp);
+
     if (match(intIp, list)) {
-        return 'DIRECT';
+        return 'PROXY proxy-shz.intel.com:912';
     };
-    return 'PROXY 127.0.0.1:8103; SOCKS5 127.0.0.1:8104; SOCKS 127.0.0.1:8104; DIRECT';
+    return 'SOCKS5 proxy.jf.intel.com:1080';
 }
