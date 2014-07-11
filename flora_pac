@@ -29,17 +29,35 @@ def generate_pac(proxy, iproxy):
 
     results = sorted(results, key = ip)
 
+    hashlist = []
+    hashline = 0
+
+    for i in range(0, 255):
+        ip_hashed = """
+        ["""
+        intLines = 0
+        for ip,mask,_ in results:
+            if ((ip & 0xff000000) % 255 == i):
+                if intLines > 0:
+                    ip_hashed = ip_hashed + ','
+                ip_hashed = ip_hashed + """
+                [%d, %d]"""%(ip, mask)
+                intLines = intLines + 1
+        ip_hashed = ip_hashed + """
+        ]"""
+        hashline = hashline + intLines
+        hashlist.append(ip_hashed)
+
+
     strLines = """
 function FindProxyForURL(url, host) {
-
-    var list = ["""
+        var list = ["""
     intLines = 0
-    for ip,mask,_ in results:
+    for iplist in hashlist:
         if intLines > 0:
             strLines = strLines + ','
         intLines = intLines + 1
-        strLines = strLines + """
-        [%d, %d]"""%(ip, mask)
+        strLines = strLines + iplist
     strLines = strLines + """
     ];
 
@@ -491,10 +509,12 @@ function FindProxyForURL(url, host) {
                      ((bytes[1] & 0xff) << 16) |
                      ((bytes[2] & 0xff) <<  8) |
                       (bytes[3] & 0xff);
-        return result;
+        return result >>> 0;
     };
 
     function match(ip, list) {
+        if (list.length == 0)
+          return false;
         var left = 0, right = list.length;
         do {
             var mid = Math.floor((left + right) / 2),
@@ -521,7 +541,7 @@ function FindProxyForURL(url, host) {
     };
 
     var strIp = dnsResolve(host);
- 
+
     if (isInNet(strIp, "10.0.0.0", "255.0.0.0") ||
         isInNet(strIp, "172.16.0.0",  "255.240.0.0") ||
         isInNet(strIp, "192.168.0.0", "255.255.0.0") ||
@@ -553,7 +573,7 @@ function FindProxyForURL(url, host) {
         }
     };
 
-    
+
     if (!strIp) {
         return '%s';
     }
@@ -565,8 +585,8 @@ function FindProxyForURL(url, host) {
     }
 
     var intIp = convertAddress(strIp);
-
-    if (match(intIp, list)) {
+    var index = ((intIp & 0xff000000) >>> 0 ) %% 255;
+    if (match(intIp, list[index])) {
         return '%s';
     };
     return '%s';
@@ -581,7 +601,7 @@ function FindProxyForURL(url, host) {
 
     print ("Rules: %d items.\n"
            "Usage: Use the newly created %s as your web browser's automatic "
-           "PAC(Proxy auto-config) file."%(intLines, pacfile))
+           "PAC(Proxy auto-config) file."%(hashline, pacfile))
 
 
 def pac_server(port):
