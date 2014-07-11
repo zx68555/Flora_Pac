@@ -526,7 +526,7 @@ function FindProxyForURL(url, host) {
     if (intPort) {
         for (i in safePorts) {
             if (safePorts[i] === intPort) {
-                return 'DIRECT';
+                return '%s';
             }
         }
     }
@@ -565,7 +565,7 @@ function FindProxyForURL(url, host) {
     return '%s';
 
 }
-"""%(iproxy, iproxy, proxy, proxy, proxy, iproxy, proxy)
+"""%(iproxy, iproxy, iproxy, proxy, proxy, proxy, iproxy, proxy)
     rfile.write(strLines)
     rfile.close()
     print ("Rules: %d items.\n"
