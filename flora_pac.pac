@@ -4453,36 +4453,36 @@ function FindProxyForURL(url, host) {
     };
 
     if (shExpMatch(host, "*.cn"))
-        return 'PROXY proxy-shz.intel.com:912';
+        return 'DIRECT';
 
     var strDomain = '.' + host;
     for (var i in safeDomains) {
         if (strDomain.indexOf('.' + safeDomains[i]) !== -1) {
-            return 'PROXY proxy-shz.intel.com:912';
+            return 'DIRECT';
         }
     };
 
     for (i in dangerDomains) {
         if (strDomain.indexOf('.' + dangerDomains[i]) !== -1) {
-            return 'SOCKS5 proxy.jf.intel.com:1080';
+            return 'PROXY 127.0.0.1:8103; SOCKS5 127.0.0.1:8104; SOCKS 127.0.0.1:8104; DIRECT';
         }
     };
 
     
     if (!strIp) {
-        return 'SOCKS5 proxy.jf.intel.com:1080';
+        return 'PROXY 127.0.0.1:8103; SOCKS5 127.0.0.1:8104; SOCKS 127.0.0.1:8104; DIRECT';
     }
 
     for (i in fakeIps) {
         if (fakeIps[i] === strIp) {
-            return 'SOCKS5 proxy.jf.intel.com:1080';
+            return 'PROXY 127.0.0.1:8103; SOCKS5 127.0.0.1:8104; SOCKS 127.0.0.1:8104; DIRECT';
         }
     }
 
     var intIp = convertAddress(strIp);
 
     if (match(intIp, list)) {
-        return 'PROXY proxy-shz.intel.com:912';
+        return 'DIRECT';
     };
-    return 'SOCKS5 proxy.jf.intel.com:1080';
+    return 'PROXY 127.0.0.1:8103; SOCKS5 127.0.0.1:8104; SOCKS 127.0.0.1:8104; DIRECT';
 }
