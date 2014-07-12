@@ -330,6 +330,15 @@ function FindProxyForURL(url, host) {
                 [737548288, 4294966272],
                 [737549312, 4294966272],
                 [737550336, 4294966272],
+                [737551360, 4294966272],
+                [737552384, 4294966272],
+                [737553408, 4294966272],
+                [737554432, 4294966272],
+                [737555456, 4294966272],
+                [737556480, 4294966272],
+                [737557504, 4294966272],
+                [737558528, 4294966272],
+                [737559552, 4294966272],
                 [737945600, 4294966272],
                 [737947648, 4294966272],
                 [737949696, 4294966272],
@@ -1096,6 +1105,15 @@ function FindProxyForURL(url, host) {
                 [1743525888, 4294966272],
                 [1743526912, 4294966272],
                 [1743527936, 4294966272],
+                [1743528960, 4294966272],
+                [1743529984, 4294966272],
+                [1743531008, 4294966272],
+                [1743532032, 4294966272],
+                [1743533056, 4294966272],
+                [1743534080, 4294966272],
+                [1743535104, 4294966272],
+                [1743536128, 4294966272],
+                [1743537152, 4294966272],
                 [1743585280, 4294966272],
                 [1743586304, 4294966272],
                 [1743587328, 4294966272],
@@ -2218,6 +2236,8 @@ function FindProxyForURL(url, host) {
                 [2738201600, 4294966272],
                 [2738202624, 4294966272],
                 [2738203648, 4294966272],
+                [2738207744, 4294966272],
+                [2738215936, 4294966272],
                 [2742878208, 4294901760],
                 [2743992320, 4294901760],
                 [2746286080, 4294901760],
@@ -4467,6 +4487,68 @@ function FindProxyForURL(url, host) {
         ]
     ];
 
+    var fake_ip_list = [
+        [
+                [624768670, 4294967295],
+                [777170500, 4294967295],
+                [1208929640, 4294967295],
+                [1249716070, 4294967295],
+                [3473692770, 4294967295]
+        ],
+        [
+                [1075927201, 4294967295],
+                [1249716081, 4294967295],
+                [1563297881, 4294967295],
+                [2674555211, 4294967295],
+                [3508816161, 4294967295]
+        ],
+        [
+                [3638410422, 4294967295]
+        ],
+        [
+                [134727213, 4294967295],
+                [1075929903, 4294967295],
+                [1309683983, 4294967295],
+                [3412199233, 4294967295],
+                [3493338923, 4294967295],
+                [3546170003, 4294967295],
+                [3584686883, 4294967295]
+        ],
+        [
+                [69485234, 4294967295]
+        ],
+        [
+                [1110310125, 4294967295],
+                [1208929635, 4294967295],
+                [3400861525, 4294967295],
+                [3416385195, 4294967295]
+        ],
+        [
+                [1249745766, 4294967295],
+                [3395944706, 4294967295],
+                [3512067466, 4294967295]
+        ],
+        [
+                [1101060977, 4294967295],
+                [2844003687, 4294967295],
+                [3639259917, 4294967295]
+        ],
+        [
+                [1097386748, 4294967295],
+                [1249738598, 4294967295],
+                [3225667078, 4294967295],
+                [3515954738, 4294967295],
+                [3520863918, 4294967295]
+        ],
+        [
+                [991429549, 4294967295],
+                [1078109179, 4294967295],
+                [2155445899, 4294967295],
+                [4089035559, 4294967295]
+        ]
+    ];
+
+
     var safeDomains = [
         '10010.com',
         '115.com',
@@ -4828,51 +4910,8 @@ function FindProxyForURL(url, host) {
         'youtube.com',
         'zaobao.com.sg'
     ];
-
-    var fakeIps = [
-        '74.125.127.102',
-        '74.125.155.102',
-        '74.125.39.102',
-        '74.125.39.113',
-        '209.85.229.138',
-        '128.121.126.139',
-        '159.106.121.75',
-        '169.132.13.103',
-        '192.67.198.6',
-        '202.106.1.2',
-        '202.181.7.85',
-        '203.161.230.171',
-        '203.98.7.65',
-        '207.12.88.98',
-        '208.56.31.43',
-        '209.145.54.50',
-        '209.220.30.174',
-        '209.36.73.33',
-        '211.94.66.147',
-        '213.169.251.35',
-        '216.221.188.182',
-        '216.234.179.13',
-        '243.185.187.39',
-        '37.61.54.158',
-        '4.36.66.178',
-        '46.82.174.68',
-        '59.24.3.173',
-        '64.33.88.161',
-        '64.33.99.47',
-        '64.66.163.251',
-        '65.104.202.252',
-        '65.160.219.113',
-        '66.45.252.237',
-        '72.14.205.104',
-        '72.14.205.99',
-        '78.16.49.15',
-        '8.7.198.45',
-        '93.46.8.89'
-    ];
-
-    // see https://github.com/clowwindy/ChinaDNS/blob/master/chinadns/dnsrelay.py
+    // safePorts must in order for matching
     var safePorts = [
-        5223,
         3478,
         3479,
         3480,
@@ -4893,6 +4932,7 @@ function FindProxyForURL(url, host) {
         3495,
         3496,
         3497,
+        5223,
         16384,
         16385,
         16386,
@@ -4918,6 +4958,24 @@ function FindProxyForURL(url, host) {
         return result >>> 0;
     };
 
+    function match_port(port) {
+        var left = 0, right = safePorts.length;
+        do {
+            var mid = Math.floor((left + right) / 2),
+                m = safePorts[mid];
+            if (port == m) {
+                return true;
+            }
+            else if (port > m) {
+                left = mid + 1;
+            }
+            else {
+                right = mid;
+            }
+        } while (left + 1 <= right)
+        return false;
+    };
+
     function match(ip, list) {
         if (list.length == 0)
           return false;
@@ -4933,11 +4991,10 @@ function FindProxyForURL(url, host) {
             } else {
                 right = mid;
             }
-        } while (left + 1 <= right)
+        } while (left + 1 <= right);
 
         return false;
     };
-
 
     if (isPlainHostName(host)
      || (host === '127.0.0.1')
@@ -4946,54 +5003,53 @@ function FindProxyForURL(url, host) {
         return 'DIRECT';
     };
 
+    var intPort = parseInt(host.split(':')[1]);
+    if (intPort) {
+        if (match_port(intPort)) {
+            return 'DIRECT'; // arg iproxy
+        }
+    };
+
     var strIp = dnsResolve(host);
+    if (!strIp) {
+        return 'PROXY 127.0.0.1:8103'; // arg out_gfw_proxy
+    }
 
     if (isInNet(strIp, "10.0.0.0", "255.0.0.0") ||
         isInNet(strIp, "172.16.0.0",  "255.240.0.0") ||
         isInNet(strIp, "192.168.0.0", "255.255.0.0") ||
-        isInNet(strIp, "127.0.0.0", "255.255.255.0"))
+        isInNet(strIp, "127.0.0.0", "255.255.255.0")) {
             return 'DIRECT';
-
-    var intPort = parseInt(host.split(':')[1]);
-    if (intPort) {
-        for (i in safePorts) {
-            if (safePorts[i] === intPort) {
-                return 'DIRECT';
-            }
-        }
-    };
-
-    if (shExpMatch(host, "*.cn"))
-        return 'DIRECT';
-
-    var strDomain = '.' + host;
-    for (var i in safeDomains) {
-        if (strDomain.indexOf('.' + safeDomains[i]) !== -1) {
-            return 'DIRECT';
-        }
-    };
-
-    for (i in dangerDomains) {
-        if (strDomain.indexOf('.' + dangerDomains[i]) !== -1) {
-            return 'PROXY 127.0.0.1:8103';
-        }
-    };
-
-
-    if (!strIp) {
-        return 'PROXY 127.0.0.1:8103';
     }
 
-    for (i in fakeIps) {
-        if (fakeIps[i] === strIp) {
-            return 'PROXY 127.0.0.1:8103';
-        }
+    if (shExpMatch(host, "*.cn")) {
+        return 'DIRECT'; // arg iproxy
     }
 
     var intIp = convertAddress(strIp);
+
+    var fakeindex = intIp % 10;
+    if (match(intIp, fake_ip_list[fakeindex])) {
+            return 'PROXY 127.0.0.1:8103'; //arg out_gfw_proxy
+    }
+
     var index = ((intIp & 0xff000000) >>> 0 ) % 255;
     if (match(intIp, list[index])) {
-        return 'DIRECT';
+        return 'DIRECT'; // arg iproxy
+    }
+    /*
+    var strDomain = '.' + host;
+    for (i in dangerDomains) {
+        if (strDomain.indexOf('.' + dangerDomains[i]) !== -1) {
+            return 'PROXY 127.0.0.1:8103';// arg out_gfw_proxy
+        }
     };
-    return 'PROXY 127.0.0.1:8103';
+
+    for (var i in safeDomains) {
+        if (strDomain.indexOf('.' + safeDomains[i]) !== -1) {
+            return 'DIRECT'; // arg iproxy
+        }
+    };
+    */
+    return 'PROXY 127.0.0.1:8103'; // arg out_gfw_proxy
 }
