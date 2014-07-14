@@ -1134,6 +1134,7 @@ function FindProxyForURL(url, host) {
                 [1743588352, 4294966272],
                 [1743591424, 4294966272],
                 [1743592448, 4294966272],
+                [1743607808, 4294966272],
                 [1743785984, 4294966272],
                 [1743791104, 4294966272],
                 [1743800320, 4294966272],
@@ -2252,6 +2253,7 @@ function FindProxyForURL(url, host) {
                 [2738203648, 4294966272],
                 [2738207744, 4294966272],
                 [2738215936, 4294966272],
+                [2738221056, 4294966272],
                 [2742878208, 4294901760],
                 [2743992320, 4294901760],
                 [2746286080, 4294901760],
@@ -4670,16 +4672,19 @@ function FindProxyForURL(url, host) {
         return 'DIRECT';
     };
 
+    var iproxy ='DIRECT'
+    var out_gfw_proxy = 'PROXY 127.0.0.1:8103; SOCKS5 127.0.0.1:8104; SOCKS 127.0.0.1:8104'
+
     var intPort = parseInt(host.split(':')[1]);
     if (intPort) {
         if (match_port(intPort)) {
-            return 'DIRECT'; // arg iproxy
+            return iproxy ; // arg iproxy
         }
     };
 
     var strIp = dnsResolve(host);
     if (!strIp) {
-        return 'PROXY 127.0.0.1:8103; SOCKS5 127.0.0.1:8104; SOCKS 127.0.0.1:8104'; // arg out_gfw_proxy
+        return out_gfw_proxy ; // arg out_gfw_proxy
     }
 
     if (isInNet(strIp, "10.0.0.0", "255.0.0.0") ||
@@ -4690,32 +4695,32 @@ function FindProxyForURL(url, host) {
     }
 
     if (shExpMatch(host, "*.cn")) {
-        return 'DIRECT'; // arg iproxy
+        return iproxy; // arg iproxy
     }
 
     var intIp = convertAddress(strIp);
 
     var fakeindex = intIp % 10;
     if (match(intIp, fake_ip_list[fakeindex])) {
-            return 'PROXY 127.0.0.1:8103; SOCKS5 127.0.0.1:8104; SOCKS 127.0.0.1:8104'; //arg out_gfw_proxy
+            return out_gfw_proxy; //arg out_gfw_proxy
     }
 
     var index = ((intIp & 0xff000000) >>> 0 ) % 255;
     if (match(intIp, list[index])) {
-        return 'DIRECT'; // arg iproxy
+        return iproxy; // arg iproxy
     }
     var strDomain = '.' + host;
     /*
     for (i in dangerDomains) {
         if (strDomain.indexOf('.' + dangerDomains[i]) !== -1) {
-            return 'PROXY 127.0.0.1:8103; SOCKS5 127.0.0.1:8104; SOCKS 127.0.0.1:8104';// arg out_gfw_proxy
+            return out_gfw_proxy;// arg out_gfw_proxy
         }
     };
     */
     for (var i in safeDomains) {
         if (strDomain.indexOf('.' + safeDomains[i]) !== -1) {
-            return 'DIRECT'; // arg iproxy
+            return iproxy; // arg iproxy
         }
     };
-    return 'PROXY 127.0.0.1:8103; SOCKS5 127.0.0.1:8104; SOCKS 127.0.0.1:8104'; // arg out_gfw_proxy
+    return out_gfw_proxy; // arg out_gfw_proxy
 }

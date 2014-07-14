@@ -204,16 +204,19 @@ function FindProxyForURL(url, host) {
         return 'DIRECT';
     };
 
+    var iproxy ='%s'
+    var out_gfw_proxy = '%s'
+
     var intPort = parseInt(host.split(':')[1]);
     if (intPort) {
         if (match_port(intPort)) {
-            return '%s'; // arg iproxy
+            return iproxy ; // arg iproxy
         }
     };
 
     var strIp = dnsResolve(host);
     if (!strIp) {
-        return '%s'; // arg out_gfw_proxy
+        return out_gfw_proxy ; // arg out_gfw_proxy
     }
 
     if (isInNet(strIp, "10.0.0.0", "255.0.0.0") ||
@@ -224,36 +227,36 @@ function FindProxyForURL(url, host) {
     }
 
     if (shExpMatch(host, "*.cn")) {
-        return '%s'; // arg iproxy
+        return iproxy; // arg iproxy
     }
 
     var intIp = convertAddress(strIp);
 
     var fakeindex = intIp %% 10;
     if (match(intIp, fake_ip_list[fakeindex])) {
-            return '%s'; //arg out_gfw_proxy
+            return out_gfw_proxy; //arg out_gfw_proxy
     }
 
     var index = ((intIp & 0xff000000) >>> 0 ) %% 255;
     if (match(intIp, list[index])) {
-        return '%s'; // arg iproxy
+        return iproxy; // arg iproxy
     }
     var strDomain = '.' + host;
     /*
     for (i in dangerDomains) {
         if (strDomain.indexOf('.' + dangerDomains[i]) !== -1) {
-            return '%s';// arg out_gfw_proxy
+            return out_gfw_proxy;// arg out_gfw_proxy
         }
     };
     */
     for (var i in safeDomains) {
         if (strDomain.indexOf('.' + safeDomains[i]) !== -1) {
-            return '%s'; // arg iproxy
+            return iproxy; // arg iproxy
         }
     };
-    return '%s'; // arg out_gfw_proxy
+    return out_gfw_proxy; // arg out_gfw_proxy
 }
-"""%(iproxy, proxy, iproxy, proxy, iproxy, proxy, iproxy, proxy)
+"""%(iproxy, proxy)
     rfile.write(strLines)
     rfile.close()
     with open(pacfile) as js_file:
