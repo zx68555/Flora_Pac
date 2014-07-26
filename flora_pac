@@ -18,12 +18,13 @@ def ip2long(ip):
 
 
 def generate_pac(proxy, iproxy):
-    results  = fetch_ip_data()
+    results, result_lists  = fetch_ip_data()
     fake_ip_results = fake_ip_data()
     pacfile  = 'flora_pac.pac'
     pacfile_min  = 'flora_pac_min.pac'
     rfile    = open(pacfile, 'w')
     rmfile    = open(pacfile_min, 'w')
+
 
     def ip(item):
         return item[0]
@@ -77,15 +78,17 @@ def generate_pac(proxy, iproxy):
 
     strLines = """
 function FindProxyForURL(url, host) {
-        var list = ["""
-    intLines = 0
-    for iplist in hashlist:
-        if intLines > 0:
-            strLines = strLines + ','
-        intLines = intLines + 1
-        strLines = strLines + iplist
+    """
+
+    #var list = ["""
+    #intLines = 0
+    #for iplist in hashlist:
+    #    if intLines > 0:
+    #        strLines = strLines + ','
+    #    intLines = intLines + 1
+    #    strLines = strLines + iplist
     strLines = strLines + """
-    ];
+    //];
 
     var fake_ip_list = ["""
     intLines = 0
@@ -96,10 +99,11 @@ function FindProxyForURL(url, host) {
         strLines = strLines + fakelist
     strLines = strLines + """
     ];
-
+    var lists = %s;
 
     var safeDomains = [
-        //'v2ex.com'
+        'v2ex.com',
+        'evernote.com'
     ];
 
     var dangerDomains = [
@@ -236,10 +240,18 @@ function FindProxyForURL(url, host) {
     if (match(intIp, fake_ip_list[fakeindex])) {
             return out_gfw_proxy; //arg out_gfw_proxy
     }
-
+    /*
     var index = ((intIp & 0xff000000) >>> 0 ) %% 255;
     if (match(intIp, list[index])) {
         return iproxy; // arg iproxy
+    }
+    */
+    var index  = parseInt(strIp.split('.', 1)[0], 10);
+    var list = lists[index];
+    for (var i in list) {
+    if (isInNet(strIp, list[i][0], list[i][1])) {
+        return 'iproxy';
+    }
     }
     var strDomain = '.' + host;
     /*
@@ -256,7 +268,7 @@ function FindProxyForURL(url, host) {
     };
     return out_gfw_proxy; // arg out_gfw_proxy
 }
-"""%(iproxy, proxy)
+"""%(repr(result_lists), iproxy, proxy)
     rfile.write(strLines)
     rfile.close()
     with open(pacfile) as js_file:
@@ -335,13 +347,20 @@ def fetch_ip_data():
     #fetch data from apnic
     print "Fetching data from apnic.net, it might take a few minutes, please wait..."
     url=r'http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest'
-  # url=r'http://flora/delegated-apnic-latest' #debug
     data=urllib2.urlopen(url).read()
     #f = open("ip.txt")
     #data = f.read()
+    #print "read frome file"
 
     cnregex=re.compile(r'apnic\|cn\|ipv4\|[0-9\.]+\|[0-9]+\|[0-9]+\|a.*',re.IGNORECASE)
     cndata=cnregex.findall(data)
+
+    cndatas = re.findall(r'(?i)apnic\|cn\|ipv4\|([0-9\.]+)\|([0-9]+)\|[0-9]+\|a.*', data)
+    cndatas = [(ip, socket.inet_ntoa(struct.pack('!I', (int(n)-1)^0xffffffff))) for ip, n in cndatas]
+    cndataslist = [[] for i in xrange(256)]
+    for ip, mask in cndatas:
+        i = int(ip.partition('.')[0])
+        cndataslist[i].append([ip, mask])
 
     results=[]
     prev_net=''
@@ -377,7 +396,7 @@ def fetch_ip_data():
 
 
 
-    return results
+    return results, cndataslist
 
 
 if __name__ == '__main__':
