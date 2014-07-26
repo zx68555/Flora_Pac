@@ -1,0 +1,410 @@
+#!/usr/bin/env python
+# Flora_Pac by @leaskh
+# www.leaskh.com, i@leaskh.com
+# Based on chnroutes project (by Numb.Majority@gmail.com)
+
+import re
+import urllib2
+import argparse
+import math
+import socket
+import struct
+from jsmin import jsmin
+
+
+def ip2long(ip):
+    packedIP = socket.inet_aton(ip)
+    return struct.unpack("!L", packedIP)[0]
+
+
+def generate_pac(proxy, iproxy):
+    results  = fetch_ip_data()
+    fake_ip_results = fake_ip_data()
+    pacfile  = 'flora_pac.pac'
+    pacfile_min  = 'flora_pac_min.pac'
+    rfile    = open(pacfile, 'w')
+    rmfile    = open(pacfile_min, 'w')
+
+    def ip(item):
+        return item[0]
+
+    results = sorted(results, key = ip)
+    fake_ip_results = sorted(fake_ip_results, key = ip)
+
+    hashlist = []
+    hashline = 0
+
+    for i in range(0, 255):
+        ip_hashed = """
+        ["""
+        intLines = 0
+        for ip,mask,_ in results:
+            if ((ip & 0xff000000) % 255 == i):
+                if intLines > 0:
+                    ip_hashed = ip_hashed + ','
+                ip_hashed = ip_hashed + """
+                [%d, %d]"""%(ip, mask)
+                intLines = intLines + 1
+        ip_hashed = ip_hashed + """
+        ]"""
+        hashline = hashline + intLines
+        hashlist.append(ip_hashed)
+
+    hashfakelist = []
+    hashfakeline = 0
+
+    for i in range(0, 10):
+        fakeip_hashed = """
+        ["""
+        intLines = 0
+        for ip,mask in fake_ip_results:
+            if (ip % 10 == i):
+                if intLines > 0:
+                    fakeip_hashed = fakeip_hashed + ','
+                fakeip_hashed = fakeip_hashed + """
+                [%d, %d]"""%(ip, mask)
+                intLines = intLines + 1
+        fakeip_hashed = fakeip_hashed + """
+        ]"""
+        hashfakeline = hashfakeline + intLines
+        hashfakelist.append(fakeip_hashed)
+
+
+
+
+
+
+
+    strLines = """
+function FindProxyForURL(url, host) {
+    var list = ["""
+    intLines = 0
+    for iplist in hashlist:
+        if intLines > 0:
+            strLines = strLines + ','
+        intLines = intLines + 1
+        strLines = strLines + iplist
+    strLines = strLines + """
+    ];
+
+    var fake_ip_list = ["""
+    intLines = 0
+    for fakelist in hashfakelist:
+        if intLines > 0:
+            strLines = strLines + ','
+        intLines = intLines + 1
+        strLines = strLines + fakelist
+    strLines = strLines + """
+    ];
+
+
+    var safeDomains = [
+        'v2ex.com',
+        'evernote.com'
+    ];
+
+    var dangerDomains = [
+     // 'apple.com',
+        'google.com',
+        'twitter.com',
+        'facebook.com',
+        'tw.yahoo.com',
+        'youtube.com',
+        'zaobao.com.sg'
+    ];
+    // safePorts must in order for matching
+    var safePorts = [
+        3478,
+        3479,
+        3480,
+        3481,
+        3482,
+        3483,
+        3484,
+        3485,
+        3486,
+        3487,
+        3488,
+        3489,
+        3490,
+        3491,
+        3492,
+        3493,
+        3494,
+        3495,
+        3496,
+        3497,
+        5223,
+        16384,
+        16385,
+        16386,
+        16387,
+        16393,
+        16394,
+        16395,
+        16396,
+        16397,
+        16398,
+        16399,
+        16400,
+        16401,
+        16402
+    ];
+
+    function convertAddress(ipchars) {
+        var bytes = ipchars.split('.');
+        var result = ((bytes[0] & 0xff) << 24) |
+                     ((bytes[1] & 0xff) << 16) |
+                     ((bytes[2] & 0xff) <<  8) |
+                      (bytes[3] & 0xff);
+        return result >>> 0;
+    };
+
+    function match_port(port) {
+        var left = 0, right = safePorts.length;
+        do {
+            var mid = Math.floor((left + right) / 2),
+                m = safePorts[mid];
+            if (port == m) {
+                return true;
+            }
+            else if (port > m) {
+                left = mid + 1;
+            }
+            else {
+                right = mid;
+            }
+        } while (left + 1 <= right)
+        return false;
+    };
+
+    function match(ip, list) {
+        if (list.length == 0)
+          return false;
+        var left = 0, right = list.length;
+        do {
+            var mid = Math.floor((left + right) / 2),
+                ip_f  = (ip & list[mid][1]) >>> 0,
+                m   = (list[mid][0] & list[mid][1]) >>> 0;
+            if (ip_f == m) {
+                return true;
+            } else if (ip_f > m) {
+                left  = mid + 1;
+            } else {
+                right = mid;
+            }
+        } while (left + 1 <= right);
+
+        return false;
+    };
+
+    if (isPlainHostName(host)
+     || (host === '127.0.0.1')
+     || (host === 'localhost')
+     || (/\\b([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\\b/.test(host))) { // @todo @removing
+        return 'DIRECT';
+    };
+
+    var iproxy ='%s'
+    var out_gfw_proxy = '%s'
+
+    var intPort = parseInt(host.split(':')[1]);
+    if (intPort) {
+        if (match_port(intPort)) {
+            return iproxy ; // arg iproxy
+        }
+    };
+
+    var strIp = dnsResolve(host);
+    if (!strIp) {
+        return out_gfw_proxy ; // arg out_gfw_proxy
+    }
+
+    if (isInNet(strIp, "10.0.0.0", "255.0.0.0") ||
+        isInNet(strIp, "172.16.0.0",  "255.240.0.0") ||
+        isInNet(strIp, "192.168.0.0", "255.255.0.0") ||
+        isInNet(strIp, "127.0.0.0", "255.255.255.0")) {
+            return 'DIRECT';
+    }
+
+    if (shExpMatch(host, "*.cn")) {
+        return iproxy; // arg iproxy
+    }
+
+    var intIp = convertAddress(strIp);
+
+    var fakeindex = intIp %% 10;
+    if (match(intIp, fake_ip_list[fakeindex])) {
+            return out_gfw_proxy; //arg out_gfw_proxy
+    }
+
+    var index = ((intIp & 0xff000000) >>> 0 ) %% 255;
+    if (match(intIp, list[index])) {
+        return iproxy; // arg iproxy
+    }
+    var strDomain = '.' + host;
+    /*
+    for (i in dangerDomains) {
+        if (strDomain.indexOf('.' + dangerDomains[i]) !== -1) {
+            return out_gfw_proxy;// arg out_gfw_proxy
+        }
+    };
+    */
+    for (var i in safeDomains) {
+        if (strDomain.indexOf('.' + safeDomains[i]) !== -1) {
+            return iproxy; // arg iproxy
+        }
+    };
+    return out_gfw_proxy; // arg out_gfw_proxy
+}
+"""%(iproxy, proxy)
+    rfile.write(strLines)
+    rfile.close()
+    with open(pacfile) as js_file:
+        pac_min = jsmin(js_file.read())
+        rmfile.write(pac_min)
+        rmfile.close()
+
+    print ("Rules: %d items.\n"
+           "Usage: Use the newly created %s as your web browser's automatic "
+           "PAC(Proxy auto-config) file."%(hashline, pacfile))
+
+
+def pac_server(port):
+    if port <= 0:
+        return
+    import SimpleHTTPServer
+    import BaseHTTPServer
+    class DefaultHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
+        def do_GET(self):
+            if self.path == '/':
+                self.path = '/flora_pac.pac'
+            return SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
+    httpd = BaseHTTPServer.HTTPServer(('0.0.0.0', port), DefaultHandler)
+    print "PAC is now serving at: 0.0.0.0:%d"%(port)
+    print "Check it out with: $ curl http://127.0.0.1:%d"%(port)
+    httpd.serve_forever()
+
+def fake_ip_data():
+    fakeIps = [
+        '74.125.127.102',
+        '74.125.155.102',
+        '74.125.39.102',
+        '74.125.39.113',
+        '209.85.229.138',
+        '128.121.126.139',
+        '159.106.121.75',
+        '169.132.13.103',
+        '192.67.198.6',
+        '202.106.1.2',
+        '202.181.7.85',
+        '203.161.230.171',
+        '203.98.7.65',
+        '207.12.88.98',
+        '208.56.31.43',
+        '209.145.54.50',
+        '209.220.30.174',
+        '209.36.73.33',
+        '211.94.66.147',
+        '213.169.251.35',
+        '216.221.188.182',
+        '216.234.179.13',
+        '243.185.187.39',
+        '37.61.54.158',
+        '4.36.66.178',
+        '46.82.174.68',
+        '59.24.3.173',
+        '64.33.88.161',
+        '64.33.99.47',
+        '64.66.163.251',
+        '65.104.202.252',
+        '65.160.219.113',
+        '66.45.252.237',
+        '72.14.205.104',
+        '72.14.205.99',
+        '78.16.49.15',
+        '8.7.198.45',
+        '93.46.8.89'
+    ]
+
+    fake_ip_int = []
+    for item in fakeIps:
+        fake_ip_int.append((ip2long(item), ip2long('255.255.255.255')))
+    return fake_ip_int
+
+def fetch_ip_data():
+    #fetch data from apnic
+    print "Fetching data from apnic.net, it might take a few minutes, please wait..."
+    url=r'http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest'
+  # url=r'http://flora/delegated-apnic-latest' #debug
+    data=urllib2.urlopen(url).read()
+    #f = open("ip.txt")
+    #data = f.read()
+
+    cnregex=re.compile(r'apnic\|cn\|ipv4\|[0-9\.]+\|[0-9]+\|[0-9]+\|a.*',re.IGNORECASE)
+    cndata=cnregex.findall(data)
+
+    results=[]
+    prev_net=''
+
+    for item in cndata:
+        unit_items=item.split('|')
+        starting_ip=unit_items[3]
+        num_ip=int(unit_items[4])
+
+        imask=0xffffffff^(num_ip-1)
+        #convert to string
+        imask=hex(imask)[2:]
+        mask=[0]*4
+        mask[0]=imask[0:2]
+        mask[1]=imask[2:4]
+        mask[2]=imask[4:6]
+        mask[3]=imask[6:8]
+
+        #convert str to int
+        mask=[ int(i,16 ) for i in mask]
+        mask="%d.%d.%d.%d"%tuple(mask)
+
+        #mask in *nix format
+        mask2=32-int(math.log(num_ip,2))
+
+        ip=starting_ip.split('.')
+        #ip[2] = '0'
+        #ip[3] = '0'
+        starting_ip = '.'.join(ip)
+        #if starting_ip != prev_net:
+        results.append((ip2long(starting_ip), ip2long(mask), mask2))
+        #    prev_net = starting_ip
+
+
+
+    return results
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Generate proxy auto-config rules.")
+    parser.add_argument('-x', '--proxy',
+                        dest    = 'proxy',
+                        default = 'SOCKS5 127.0.0.1:8964; SOCKS 127.0.0.1:8964; DIRECT',
+                        nargs   = '?',
+                        help    = "Proxy Server, examples: "
+                                  "SOCKS5 127.0.0.1:8964; "
+                                  "SOCKS 127.0.0.1:8964; "
+                                  "PROXY 127.0.0.1:6489")
+
+    parser.add_argument('-i', '--iproxy',
+                        dest    = 'iproxy',
+                        default = 'DIRECT',
+                        nargs   = '?',
+                        help    = "Internal Proxy Server, for some internal network which have to set a proxy for internet access")
+
+    parser.add_argument('-p', '--port',
+                        dest    = 'port',
+                        default = '0',
+                        nargs   = '?',
+                        help    = "Pac Server Port [OPTIONAL], examples: 8970")
+
+
+    args = parser.parse_args()
+    generate_pac(args.proxy, args.iproxy)
+    pac_server(int(args.port))
