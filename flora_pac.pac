@@ -5057,6 +5057,9 @@ function FindProxyForURL(url, host) {
         "zongheng.com": 1,
         "v2ex.com": 1,
         "v2root.com": 1,
+        "gwdang.com": 1,
+        "yinxiang.com": 1,
+        "icloud.com": 1,
         "evernote.com": 1
     };
 
@@ -7608,8 +7611,7 @@ function FindProxyForURL(url, host) {
 
     if (isPlainHostName(host)
      || (host === '127.0.0.1')
-     || (host === 'localhost')
-     || (/\b([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\b/.test(host))) { // @todo @removing
+     || (host === 'localhost')) {
         return 'DIRECT';
     };
 
