@@ -5062,6 +5062,7 @@ function FindProxyForURL(url, host) {
         "icloud.com": 1,
         "geotrust.com": 1,
         "verisign.com": 1,
+        "cloudfront.net": 1,
         "evernote.com": 1
     };
 
