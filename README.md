@@ -35,8 +35,9 @@ $ ./flora_pac -x 'SOCKS5 127.0.0.1:8964; SOCKS 127.0.0.1:8964; DIRECT' -p 8970
 * Use test_build.sh to generate a pac file, replace the proxy address in the script before you launch it.
 <pre>
 $./test_buils.sh
-flora_pac.pac and flora_pac_min.pac will be generated, floar_pac_min.pac is samller the flora_pac.pac, but hard for reading.
 </pre>
+flora_pac.pac and flora_pac_min.pac will be generated, floar_pac_min.pac is samller than the flora_pac.pac, but hard for reading.
+you can edit the flora.pac to add safeDomain and dangerDomain.
 
 ![PAC Server demo on Mac](https://raw.github.com/Leask/Flora_Pac/master/screenshots/mac.jpg "PAC Server demo on Mac")
 
