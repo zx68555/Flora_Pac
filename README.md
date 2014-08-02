@@ -12,7 +12,7 @@ $ git clone https://github.com/usufu/Flora_Pac.git
 ## Uasge
 <pre>
 $ ./flora_pac -h
-usage: flora_pac [-h] [-x [PROXY]] [-p [PORT]]
+usage: flora_pac [-h] [-x [PROXY]] [-p [PORT]] [-i [PROXY]]
 
 Generate proxy auto-config rules.
 
@@ -32,8 +32,13 @@ optional arguments:
 <pre>
 $ ./flora_pac -x 'SOCKS5 127.0.0.1:8964; SOCKS 127.0.0.1:8964; DIRECT' -p 8970
 </pre>
+* Use test_build.sh to generate a pac file, replace the proxy address in the script before you launch it.
+<pre>
+$./test_buils.sh
+flora_pac.pac and flora_pac_min.pac will be generated, floar_pac_min.pac is samller the flora_pac.pac, but hard for reading.
+</pre>
+
 ![PAC Server demo on Mac](https://raw.github.com/Leask/Flora_Pac/master/screenshots/mac.jpg "PAC Server demo on Mac")
-* [NEW] Use it directly from official host:
 
 ## Get help
 * twitter: @cnpipe
