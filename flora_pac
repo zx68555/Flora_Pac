@@ -3000,6 +3000,10 @@ def generate_pac(proxy, iproxy):
     };
     function FindProxyForURL(url, host) {
 
+    if (shExpMatch(host, "*.cn")) {
+        return iproxy; // arg iproxy
+    }
+
     if (hostindomains(safeDomains, host))
         return iproxy;
 
@@ -3012,10 +3016,7 @@ def generate_pac(proxy, iproxy):
         return 'DIRECT';
     };
 
-    if (shExpMatch(host, "*.cn")) {
-        return iproxy; // arg iproxy
-    }
-
+    
     var strIp = dnsResolve(host);
     if (!strIp) {
         return out_gfw_proxy ; // arg out_gfw_proxy

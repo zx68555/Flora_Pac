@@ -4952,6 +4952,7 @@
         "sinaapp.com": 1,
         "sinaedge.com": 1,
         "sinaimg.com": 1,
+        "sinaimg.cn": 1,
         "sinajs.com": 1,
         "skycn.com": 1,
         "smzdm.com": 1,
@@ -7610,6 +7611,10 @@
     };
     function FindProxyForURL(url, host) {
 
+    if (shExpMatch(host, "*.cn")) {
+        return iproxy; // arg iproxy
+    }
+
     if (hostindomains(safeDomains, host))
         return iproxy;
 
@@ -7622,9 +7627,6 @@
         return 'DIRECT';
     };
 
-    if (shExpMatch(host, "*.cn")) {
-        return iproxy; // arg iproxy
-    }
 
     var strIp = dnsResolve(host);
     if (!strIp) {
