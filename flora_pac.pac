@@ -1,5 +1,7 @@
 
-function FindProxyForURL(url, host) {
+    var hasOwnProperty = Object.hasOwnProperty;
+    var iproxy ='DIRECT';
+    var out_gfw_proxy = 'PROXY 127.0.0.1:8103; SOCKS5 127.0.0.1:8104; SOCKS 127.0.0.1:8104';
     var list = [
         [
         ],
@@ -4645,7 +4647,6 @@ function FindProxyForURL(url, host) {
         [
         ]
     ];
-
     var fake_ip_list = [
         [
                 [624768670, 4294967295],
@@ -4706,9 +4707,7 @@ function FindProxyForURL(url, host) {
                 [4089035559, 4294967295]
         ]
     ];
-
-
-    var safeDomains = {
+        var safeDomains = {
         "10010.com": 1,
         "115.com": 1,
         "123u.com": 1,
@@ -5062,7 +5061,8 @@ function FindProxyForURL(url, host) {
         "icloud.com": 1,
         "geotrust.com": 1,
         "verisign.com": 1,
-        "cloudfront.net": 1,
+        "feng.com": 1,
+        "scorecardresearch.com": 1,
         "evernote.com": 1
     };
 
@@ -7504,8 +7504,7 @@ function FindProxyForURL(url, host) {
       "wtfpeople.com": 1,
       "1-apple.com.tw": 1
     };
-
-    // safePorts must in order for matching
+   // safePorts must in order for matching
     var safePorts = [
         3478,
         3479,
@@ -7543,7 +7542,6 @@ function FindProxyForURL(url, host) {
         16401,
         16402
     ];
-
     function convertAddress(ipchars) {
         var bytes = ipchars.split('.');
         var result = ((bytes[0] & 0xff) << 24) |
@@ -7592,7 +7590,6 @@ function FindProxyForURL(url, host) {
     };
 
     function hostindomains(domains, host) {
-        var hasOwnProperty = Object.hasOwnProperty;
         var suffix;
         var pos = host.lastIndexOf('.');
         pos = host.lastIndexOf('.', pos - 1);
@@ -7611,19 +7608,7 @@ function FindProxyForURL(url, host) {
             pos = host.lastIndexOf('.', pos - 1);
         }
     };
-
-    if (isPlainHostName(host)
-     || (host === '127.0.0.1')
-     || (host === 'localhost')) {
-        return 'DIRECT';
-    };
-
-    var iproxy ='DIRECT'
-    var out_gfw_proxy = 'PROXY 127.0.0.1:8103; SOCKS5 127.0.0.1:8104; SOCKS 127.0.0.1:8104'
-
-    if (shExpMatch(host, "*.cn")) {
-        return iproxy; // arg iproxy
-    }
+    function FindProxyForURL(url, host) {
 
     if (hostindomains(safeDomains, host))
         return iproxy;
@@ -7631,6 +7616,15 @@ function FindProxyForURL(url, host) {
     if (hostindomains(dangerDomains, host))
         return out_gfw_proxy;
 
+    if (isPlainHostName(host)
+     || (host === '127.0.0.1')
+     || (host === 'localhost')) {
+        return 'DIRECT';
+    };
+
+    if (shExpMatch(host, "*.cn")) {
+        return iproxy; // arg iproxy
+    }
 
     var strIp = dnsResolve(host);
     if (!strIp) {

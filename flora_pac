@@ -76,29 +76,28 @@ def generate_pac(proxy, iproxy):
 
 
     strLines = """
-function FindProxyForURL(url, host) {
-    var list = ["""
+    var hasOwnProperty = Object.hasOwnProperty;
+    var iproxy ='%s';
+    var out_gfw_proxy = '%s';
+    var list = ["""%(iproxy, proxy)
     intLines = 0
     for iplist in hashlist:
-        if intLines > 0:
-            strLines = strLines + ','
-        intLines = intLines + 1
-        strLines = strLines + iplist
+      if intLines > 0:
+        strLines = strLines + ','
+      intLines = intLines + 1
+      strLines = strLines + iplist
     strLines = strLines + """
     ];
-
     var fake_ip_list = ["""
     intLines = 0
     for fakelist in hashfakelist:
-        if intLines > 0:
-            strLines = strLines + ','
-        intLines = intLines + 1
-        strLines = strLines + fakelist
+      if intLines > 0:
+        strLines = strLines + ','
+      intLines = intLines + 1
+      strLines = strLines + fakelist
     strLines = strLines + """
     ];
-
-
-    var safeDomains = {
+        var safeDomains = {
         "10010.com": 1,
         "115.com": 1,
         "123u.com": 1,
@@ -452,6 +451,8 @@ function FindProxyForURL(url, host) {
         "icloud.com": 1,
         "geotrust.com": 1,
         "verisign.com": 1,
+        "feng.com": 1,
+        "scorecardresearch.com": 1,
         "evernote.com": 1
     };
 
@@ -2893,8 +2894,7 @@ function FindProxyForURL(url, host) {
       "wtfpeople.com": 1,
       "1-apple.com.tw": 1
     };
-
-    // safePorts must in order for matching
+   // safePorts must in order for matching
     var safePorts = [
         3478,
         3479,
@@ -2932,7 +2932,6 @@ function FindProxyForURL(url, host) {
         16401,
         16402
     ];
-
     function convertAddress(ipchars) {
         var bytes = ipchars.split('.');
         var result = ((bytes[0] & 0xff) << 24) |
@@ -2981,7 +2980,6 @@ function FindProxyForURL(url, host) {
     };
 
     function hostindomains(domains, host) {
-        var hasOwnProperty = Object.hasOwnProperty;
         var suffix;
         var pos = host.lastIndexOf('.');
         pos = host.lastIndexOf('.', pos - 1);
@@ -3000,19 +2998,7 @@ function FindProxyForURL(url, host) {
             pos = host.lastIndexOf('.', pos - 1);
         }
     };
-
-    if (isPlainHostName(host)
-     || (host === '127.0.0.1')
-     || (host === 'localhost')) {
-        return 'DIRECT';
-    };
-
-    var iproxy ='%s'
-    var out_gfw_proxy = '%s'
-
-    if (shExpMatch(host, "*.cn")) {
-        return iproxy; // arg iproxy
-    }
+    function FindProxyForURL(url, host) {
 
     if (hostindomains(safeDomains, host))
         return iproxy;
@@ -3020,6 +3006,15 @@ function FindProxyForURL(url, host) {
     if (hostindomains(dangerDomains, host))
         return out_gfw_proxy;
 
+    if (isPlainHostName(host)
+     || (host === '127.0.0.1')
+     || (host === 'localhost')) {
+        return 'DIRECT';
+    };
+
+    if (shExpMatch(host, "*.cn")) {
+        return iproxy; // arg iproxy
+    }
 
     var strIp = dnsResolve(host);
     if (!strIp) {
@@ -3042,18 +3037,18 @@ function FindProxyForURL(url, host) {
 
     var intIp = convertAddress(strIp);
 
-    var fakeindex = intIp %% 10;
+    var fakeindex = intIp % 10;
     if (match(intIp, fake_ip_list[fakeindex])) {
             return out_gfw_proxy; //arg out_gfw_proxy
     }
 
-    var index = ((intIp & 0xff000000) >>> 0 ) %% 255;
+    var index = ((intIp & 0xff000000) >>> 0 ) % 255;
     if (match(intIp, list[index])) {
         return iproxy; // arg iproxy
     }
     return out_gfw_proxy; // arg out_gfw_proxy
 }
-"""%(iproxy, proxy)
+"""
     rfile.write(strLines)
     rfile.close()
     with open(pacfile) as js_file:
@@ -3132,7 +3127,6 @@ def fetch_ip_data():
     #fetch data from apnic
     print "Fetching data from apnic.net, it might take a few minutes, please wait..."
     url=r'http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest'
-  # url=r'http://flora/delegated-apnic-latest' #debug
     data=urllib2.urlopen(url).read()
     #f = open("ip.txt")
     #data = f.read()
